@@ -2,8 +2,9 @@
 pragma solidity 0.8.19;
 
 import "./IGuardManager.sol";
+import "./IEIP4824.sol";
 
-interface IChamber is IGuardManager{
+interface IChamber is IEIP4824,IGuardManager{
 
     /**************************************************
         State

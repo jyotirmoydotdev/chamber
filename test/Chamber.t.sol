@@ -329,4 +329,36 @@ contract ChamberTest is Test {
         assertEq(_delegations[4], 2_000 ether);
         vm.stopPrank();
     }
+
+    function test_SetDaoURI()public{
+        promoteMembers();
+        vm.startPrank(vm.addr(1));
+        /*****************************************************
+          Set the daoURI to https://example.com/jsonData.json
+        ******************************************************/
+
+        string memory testData = "https://example.com/jsonData.json";
+
+        bytes[] memory dataArray = new bytes[](1);
+        address[] memory targetArray = new address[](1);
+        uint256[] memory valueArray = new uint256[](1);
+
+        dataArray[0] = abi.encodeWithSignature("setDaoURI(string)",testData );
+        targetArray[0] = address(chamber);
+        valueArray[0] = 0;
+
+        chamber.createProposal(targetArray, valueArray, dataArray);
+
+        chamber.approveProposal(1, 3,getSignature(1,3,1));
+        chamber.approveProposal(1, 2,getSignature(1,2,1));
+
+        // Execute Proposal
+        chamber.approveProposal(1, 1,getSignature(1,1,1));
+
+        string memory fetchDaoURI = chamber.daoURI();
+
+        assertEq(fetchDaoURI, testData);
+
+        vm.stopPrank();
+    }
 }

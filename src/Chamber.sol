@@ -6,9 +6,13 @@ pragma solidity 0.8.19;
 import { IChamber } from "./interfaces/IChamber.sol";
 import "./GuardManager.sol";
 import "./Common.sol";
+import "./interfaces/IEIP4824.sol";
 
 contract Chamber is IChamber, Common, GuardManager{
     using ECDSA for bytes32;
+
+    /// @notice The [EIP-4824](https://eips.ethereum.org/EIPS/eip-4824) DAO uri.
+    string private _daoURI;
 
     // keccak256("EIP712Domain(uint256 chainId,address verifyingContract)");
     bytes32 private constant DOMAIN_SEPARATOR_TYPEHASH= 0x47e79534a245952e8b16893a336b85a3d9ea9fa8c573f3d803afb92a79469218;
@@ -298,6 +302,28 @@ contract Chamber is IChamber, Common, GuardManager{
                 _tokenId
             )
         );
+    }
+
+    /// @inheritdoc IEIP4824
+    function daoURI() external view returns (string memory) {
+        return _daoURI;
+    }
+
+    /// @notice Updates the set DAO uri to a new value.
+    /// @param newDaoURI The new DAO uri to be set.
+    function setDaoURI(string calldata newDaoURI)
+        external
+        authorized
+    {
+        _setDaoURI(newDaoURI);
+    }
+
+    /// @notice Sets the new DAO uri and emits the associated event.
+    /// @param daoURI_ The new DAO uri.
+    function _setDaoURI(string calldata daoURI_) internal {
+        _daoURI = daoURI_;
+
+        emit NewURI(daoURI_);
     }
 
     fallback() external payable {
